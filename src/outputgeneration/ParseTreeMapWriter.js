@@ -22,11 +22,12 @@ export class ParseTreeMapWriter extends ParseTreeWriter {
    * @param {SourceMapGenerator} sourceMapGenerator
    * @param {Object} options for ParseTreeWriter
    */
-  constructor(sourceMapGenerator, options = undefined) {
+  constructor(sourceMapGenerator, options = undefined, embedContent = true) {
     super(options);
     this.sourceMapGenerator_ = sourceMapGenerator;
     this.outputLineCount_ = 1;
     this.isFirstMapping_ = true;
+	this.embedContent_ = embedContent;
   }
 
   //
@@ -112,8 +113,9 @@ export class ParseTreeMapWriter extends ParseTreeWriter {
     };
     if (position.source.name !== this.sourceName_) {
       this.sourceName_ = position.source.name;
-      this.sourceMapGenerator_.setSourceContent(position.source.name,
-          position.source.contents);
+      if (this.embedContent_)
+          this.sourceMapGenerator_.setSourceContent(position.source.name,
+              position.source.contents);
     }
     this.flushMappings();
   }

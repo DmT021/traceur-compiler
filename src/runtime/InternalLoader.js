@@ -49,7 +49,7 @@ class CodeUnit {
     this.type = type;
     this.name_ = name;
     this.referrerName_ = referrerName;
-    this.address_ = address;
+    this.address = address;
     this.url = InternalLoader.uniqueName(normalizedName, address);
     this.uid = getUid();
     this.state_ = state || NOT_STARTED;
@@ -194,6 +194,14 @@ class EvalCodeUnit extends HookedCodeUnit {
 
 var uniqueNameCount = 0;
 
+function toBase64(str) {
+	try {
+		return btoa(str);
+	} catch(e) {
+		return new Buffer(str).toString('base64');
+	}
+}
+
 /**
  * The internal implementation of the code loader.
  */
@@ -248,8 +256,9 @@ export class InternalLoader {
   }
 
   module(code, referrerName, address) {
+    var normalizedName = null;//address;
     var codeUnit = new EvalCodeUnit(this.loaderHooks, code, 'module',
-                                      null, referrerName, address);
+                                      normalizedName, referrerName, address);
     this.cache.set({}, codeUnit);
     this.handleCodeUnitLoaded(codeUnit);
     return codeUnit.promise;
@@ -433,10 +442,18 @@ export class InternalLoader {
     metadata.transformedTree = codeUnit.transform();
     codeUnit.state = TRANSFORMED;
     var filename = codeUnit.address || codeUnit.normalizedName;
+	//this.options.filename = filename;
     [metadata.transcoded, metadata.sourceMap] =
-        toSource(metadata.transformedTree, this.options, filename);
+        toSource(metadata.transformedTree, this.options, false);
     if (codeUnit.address && metadata.transcoded)
       metadata.transcoded += '//# sourceURL=' + codeUnit.address;
+	try {
+	  if (metadata.sourceMap)
+        metadata.transcoded += '\n' + '//# sourceMappingURL=' +
+	        'data:application/json;charset=utf-8;base64,' + toBase64(metadata.sourceMap);
+	} catch(e) {
+	  // TODO if `toBase64` throws error we should process it
+	}
   }
 
   checkForErrors(dependencies, phase) {

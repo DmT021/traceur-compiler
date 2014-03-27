@@ -7518,10 +7518,12 @@ System.register("traceur@0.0.33/src/outputgeneration/ParseTreeMapWriter", [], fu
   var ParseTreeWriter = System.get("traceur@0.0.33/src/outputgeneration/ParseTreeWriter").ParseTreeWriter;
   var ParseTreeMapWriter = function ParseTreeMapWriter(sourceMapGenerator) {
     var options = arguments[1];
+    var embedContent = arguments[2] !== (void 0) ? arguments[2] : true;
     $traceurRuntime.superCall(this, $ParseTreeMapWriter.prototype, "constructor", [options]);
     this.sourceMapGenerator_ = sourceMapGenerator;
     this.outputLineCount_ = 1;
     this.isFirstMapping_ = true;
+    this.embedContent_ = embedContent;
   };
   var $ParseTreeMapWriter = ParseTreeMapWriter;
   ($traceurRuntime.createClass)(ParseTreeMapWriter, {
@@ -7581,7 +7583,8 @@ System.register("traceur@0.0.33/src/outputgeneration/ParseTreeMapWriter", [], fu
       };
       if (position.source.name !== this.sourceName_) {
         this.sourceName_ = position.source.name;
-        this.sourceMapGenerator_.setSourceContent(position.source.name, position.source.contents);
+        if (this.embedContent_)
+          this.sourceMapGenerator_.setSourceContent(position.source.name, position.source.contents);
       }
       this.flushMappings();
     },
@@ -8626,6 +8629,7 @@ System.register("traceur@0.0.33/src/outputgeneration/toSource", [], function() {
   var SourceMapGenerator = System.get("traceur@0.0.33/src/outputgeneration/SourceMapIntegration").SourceMapGenerator;
   function toSource(tree) {
     var options = arguments[1];
+    var embedContentToSourceMap = arguments[2] !== (void 0) ? arguments[2] : true;
     var sourceMapGenerator = options && options.sourceMapGenerator;
     if (!sourceMapGenerator && options && options.sourceMaps) {
       sourceMapGenerator = new SourceMapGenerator({
@@ -8635,7 +8639,7 @@ System.register("traceur@0.0.33/src/outputgeneration/toSource", [], function() {
     }
     var writer;
     if (sourceMapGenerator)
-      writer = new ParseTreeMapWriter(sourceMapGenerator, options);
+      writer = new ParseTreeMapWriter(sourceMapGenerator, options, embedContentToSourceMap);
     else
       writer = new ParseTreeWriter(options);
     writer.visitAny(tree);
@@ -20944,7 +20948,7 @@ System.register("traceur@0.0.33/src/runtime/InternalLoader", [], function() {
     this.type = type;
     this.name_ = name;
     this.referrerName_ = referrerName;
-    this.address_ = address;
+    this.address = address;
     this.url = InternalLoader.uniqueName(normalizedName, address);
     this.uid = getUid();
     this.state_ = state || NOT_STARTED;
@@ -21051,6 +21055,13 @@ System.register("traceur@0.0.33/src/runtime/InternalLoader", [], function() {
   var $EvalCodeUnit = EvalCodeUnit;
   ($traceurRuntime.createClass)(EvalCodeUnit, {}, {}, HookedCodeUnit);
   var uniqueNameCount = 0;
+  function toBase64(str) {
+    try {
+      return btoa(str);
+    } catch (e) {
+      return new Buffer(str).toString('base64');
+    }
+  }
   var InternalLoader = function InternalLoader(loaderHooks) {
     this.loaderHooks = loaderHooks;
     this.reporter = loaderHooks.reporter;
@@ -21098,7 +21109,8 @@ System.register("traceur@0.0.33/src/runtime/InternalLoader", [], function() {
       return codeUnit;
     },
     module: function(code, referrerName, address) {
-      var codeUnit = new EvalCodeUnit(this.loaderHooks, code, 'module', null, referrerName, address);
+      var normalizedName = null;
+      var codeUnit = new EvalCodeUnit(this.loaderHooks, code, 'module', normalizedName, referrerName, address);
       this.cache.set({}, codeUnit);
       this.handleCodeUnitLoaded(codeUnit);
       return codeUnit.promise;
@@ -21240,9 +21252,13 @@ System.register("traceur@0.0.33/src/runtime/InternalLoader", [], function() {
       metadata.transformedTree = codeUnit.transform();
       codeUnit.state = TRANSFORMED;
       var filename = codeUnit.address || codeUnit.normalizedName;
-      ($__325 = toSource(metadata.transformedTree, this.options, filename), metadata.transcoded = $__325[0], metadata.sourceMap = $__325[1], $__325);
+      ($__325 = toSource(metadata.transformedTree, this.options, false), metadata.transcoded = $__325[0], metadata.sourceMap = $__325[1], $__325);
       if (codeUnit.address && metadata.transcoded)
         metadata.transcoded += '//# sourceURL=' + codeUnit.address;
+      try {
+        if (metadata.sourceMap)
+          metadata.transcoded += '\n' + '//# sourceMappingURL=' + 'data:application/json;charset=utf-8;base64,' + toBase64(metadata.sourceMap);
+      } catch (e) {}
     },
     checkForErrors: function(dependencies, phase) {
       if (this.reporter.hadError()) {
@@ -21419,7 +21435,7 @@ System.register("traceur@0.0.33/src/WebPageTranscoder", [], function() {
       }));
     },
     addFileFromScriptElement: function(scriptElement, name, content) {
-      this.loader.module(content, name);
+      this.loader.module(content, {address: name});
     },
     nextInlineScriptName_: function() {
       this.numberInlined_ += 1;

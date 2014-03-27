@@ -26,7 +26,7 @@ import {SourceMapGenerator} from './SourceMapIntegration';
  *     sourceMapGenerator: {SourceMapGenerator} see third-party/source-maps
  * @return source code; optional side-effect options.sourceMap set
  */
-export function toSource(tree, options = undefined) {
+export function toSource(tree, options = undefined, embedContentToSourceMap = true) {
   var sourceMapGenerator = options && options.sourceMapGenerator;
   if (!sourceMapGenerator && options && options.sourceMaps) {
     sourceMapGenerator = new SourceMapGenerator({
@@ -37,7 +37,7 @@ export function toSource(tree, options = undefined) {
 
   var writer;
   if (sourceMapGenerator)
-    writer = new ParseTreeMapWriter(sourceMapGenerator, options);
+    writer = new ParseTreeMapWriter(sourceMapGenerator, options, embedContentToSourceMap);
   else
     writer = new ParseTreeWriter(options);
 
