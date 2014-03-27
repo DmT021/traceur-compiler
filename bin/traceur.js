@@ -21252,7 +21252,7 @@ System.register("traceur@0.0.33/src/runtime/InternalLoader", [], function() {
       metadata.transformedTree = codeUnit.transform();
       codeUnit.state = TRANSFORMED;
       var filename = codeUnit.address || codeUnit.normalizedName;
-      ($__325 = toSource(metadata.transformedTree, this.options, false), metadata.transcoded = $__325[0], metadata.sourceMap = $__325[1], $__325);
+      ($__325 = toSource(metadata.transformedTree, this.options, true), metadata.transcoded = $__325[0], metadata.sourceMap = $__325[1], $__325);
       if (codeUnit.address && metadata.transcoded)
         metadata.transcoded += '//# sourceURL=' + codeUnit.address;
       try {
