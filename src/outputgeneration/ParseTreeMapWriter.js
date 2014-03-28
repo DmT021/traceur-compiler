@@ -27,7 +27,7 @@ export class ParseTreeMapWriter extends ParseTreeWriter {
     this.sourceMapGenerator_ = sourceMapGenerator;
     this.outputLineCount_ = 1;
     this.isFirstMapping_ = true;
-	this.embedContent_ = embedContent;
+    this.embedContent_ = false;
   }
 
   //

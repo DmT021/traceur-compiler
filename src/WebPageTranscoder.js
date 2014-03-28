@@ -43,7 +43,10 @@ export class WebPageTranscoder {
   }
 
   addFileFromScriptElement(scriptElement, name, content) {
-    this.loader.module(content, {address: name});
+    if (scriptElement.type === "script")
+      this.loader.script(content, name, {address: name});
+    else
+      this.loader.module(content, {address: name});
   }
 
   /**
@@ -106,7 +109,7 @@ export class WebPageTranscoder {
   }
 
   selectAndProcessScripts(done) {
-    var selector = 'script[type="module"]';
+    var selector = 'script[type="module"], script[type="script"]';
     var scripts = document.querySelectorAll(selector);
 
     if (!scripts.length) {

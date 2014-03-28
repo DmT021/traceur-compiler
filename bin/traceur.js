@@ -7523,7 +7523,7 @@ System.register("traceur@0.0.33/src/outputgeneration/ParseTreeMapWriter", [], fu
     this.sourceMapGenerator_ = sourceMapGenerator;
     this.outputLineCount_ = 1;
     this.isFirstMapping_ = true;
-    this.embedContent_ = embedContent;
+    this.embedContent_ = false;
   };
   var $ParseTreeMapWriter = ParseTreeMapWriter;
   ($traceurRuntime.createClass)(ParseTreeMapWriter, {
@@ -21369,6 +21369,12 @@ System.register("traceur@0.0.33/src/runtime/Loader", [], function() {
           address = $__328.address;
       return this.internalLoader_.module(source, referrerName, address);
     },
+    script: function(source, name) {
+      var $__328 = arguments[2] !== (void 0) ? arguments[2] : {},
+          referrerName = $__328.referrerName,
+          address = $__328.address;
+      return this.internalLoader_.script(source, name, referrerName, address);
+    },
     define: function(normalizedName, source) {
       var $__328 = arguments[2] !== (void 0) ? arguments[2] : {},
           address = $__328.address,
@@ -21435,7 +21441,10 @@ System.register("traceur@0.0.33/src/WebPageTranscoder", [], function() {
       }));
     },
     addFileFromScriptElement: function(scriptElement, name, content) {
-      this.loader.module(content, {address: name});
+      if (scriptElement.type === "script")
+        this.loader.script(content, name, {address: name});
+      else
+        this.loader.module(content, {address: name});
     },
     nextInlineScriptName_: function() {
       this.numberInlined_ += 1;
@@ -21483,7 +21492,7 @@ System.register("traceur@0.0.33/src/WebPageTranscoder", [], function() {
       parent.insertBefore(scriptElement, file.scriptElement || null);
     },
     selectAndProcessScripts: function(done) {
-      var selector = 'script[type="module"]';
+      var selector = 'script[type="module"], script[type="script"]';
       var scripts = document.querySelectorAll(selector);
       if (!scripts.length) {
         done();

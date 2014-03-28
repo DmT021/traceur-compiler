@@ -46,6 +46,10 @@ export class Loader {
   module(source, {referrerName, address} = {}) {
     return this.internalLoader_.module(source, referrerName, address);
   }
+  
+  script(source, name, {referrerName, address} = {}) {
+    return this.internalLoader_.script(source, name, referrerName, address);
+  }
 
   /**
    * Asynchronously install a new module under `name` from the `source` code.
