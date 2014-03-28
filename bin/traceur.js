@@ -7098,7 +7098,7 @@ System.register("traceur@0.0.33/src/outputgeneration/ParseTreeWriter", [], funct
     visitImportDeclaration: function(tree) {
       this.write_(IMPORT);
       this.writeSpace_();
-      if (this.importClause) {
+      if (tree.importClause) {
         this.visitAny(tree.importClause);
         this.writeSpace_();
         this.write_(FROM);
