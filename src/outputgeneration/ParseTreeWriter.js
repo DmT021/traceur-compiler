@@ -276,7 +276,7 @@ export class ParseTreeWriter extends ParseTreeVisitor {
    */
   visitArrowFunctionExpression(tree) {
     this.write_(OPEN_PAREN);
-    this.visitAny(tree.formalParameters);
+    this.visitAny(tree.parameterList);
     this.write_(CLOSE_PAREN);
     this.writeSpace_();
     this.write_(ARROW);
@@ -724,7 +724,7 @@ export class ParseTreeWriter extends ParseTreeVisitor {
     }
 
     this.write_(OPEN_PAREN);
-    this.visitAny(tree.formalParameterList);
+    this.visitAny(tree.parameterList);
     this.write_(CLOSE_PAREN);
     this.writeTypeAnnotation_(tree.typeAnnotation);
     this.writeSpace_();
@@ -817,7 +817,7 @@ export class ParseTreeWriter extends ParseTreeVisitor {
   visitImportDeclaration(tree) {
     this.write_(IMPORT);
     this.writeSpace_();
-    if (this.importClause) {
+    if (tree.importClause) {
       this.visitAny(tree.importClause);
       this.writeSpace_();
       this.write_(FROM);
@@ -1031,7 +1031,7 @@ export class ParseTreeWriter extends ParseTreeVisitor {
 
     this.visitAny(tree.name);
     this.write_(OPEN_PAREN);
-    this.visitAny(tree.formalParameterList);
+    this.visitAny(tree.parameterList);
     this.write_(CLOSE_PAREN);
     this.writeSpace_();
     this.writeTypeAnnotation_(tree.typeAnnotation);
@@ -1119,7 +1119,7 @@ export class ParseTreeWriter extends ParseTreeVisitor {
     this.writeSpace_();
     this.visitAny(tree.name);
     this.write_(OPEN_PAREN);
-    this.visitAny(tree.parameter);
+    this.visitAny(tree.parameterList);
     this.write_(CLOSE_PAREN);
     this.writeSpace_();
     this.visitAny(tree.body);
