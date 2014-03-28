@@ -7523,7 +7523,6 @@ System.register("traceur@0.0.33/src/outputgeneration/ParseTreeMapWriter", [], fu
     this.sourceMapGenerator_ = sourceMapGenerator;
     this.outputLineCount_ = 1;
     this.isFirstMapping_ = true;
-    this.embedContent_ = false;
   };
   var $ParseTreeMapWriter = ParseTreeMapWriter;
   ($traceurRuntime.createClass)(ParseTreeMapWriter, {
@@ -7583,8 +7582,7 @@ System.register("traceur@0.0.33/src/outputgeneration/ParseTreeMapWriter", [], fu
       };
       if (position.source.name !== this.sourceName_) {
         this.sourceName_ = position.source.name;
-        if (this.embedContent_)
-          this.sourceMapGenerator_.setSourceContent(position.source.name, position.source.contents);
+        this.sourceMapGenerator_.setSourceContent(position.source.name, position.source.contents);
       }
       this.flushMappings();
     },
@@ -21252,7 +21250,7 @@ System.register("traceur@0.0.33/src/runtime/InternalLoader", [], function() {
       metadata.transformedTree = codeUnit.transform();
       codeUnit.state = TRANSFORMED;
       var filename = codeUnit.address || codeUnit.normalizedName;
-      ($__325 = toSource(metadata.transformedTree, this.options, true), metadata.transcoded = $__325[0], metadata.sourceMap = $__325[1], $__325);
+      ($__325 = toSource(metadata.transformedTree, this.options), metadata.transcoded = $__325[0], metadata.sourceMap = $__325[1], $__325);
       if (codeUnit.address && metadata.transcoded)
         metadata.transcoded += '//# sourceURL=' + codeUnit.address;
       try {

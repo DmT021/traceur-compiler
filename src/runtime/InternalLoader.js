@@ -444,7 +444,7 @@ export class InternalLoader {
     var filename = codeUnit.address || codeUnit.normalizedName;
     //this.options.filename = filename;
     [metadata.transcoded, metadata.sourceMap] =
-        toSource(metadata.transformedTree, this.options, true);
+        toSource(metadata.transformedTree, this.options);
     if (codeUnit.address && metadata.transcoded)
       metadata.transcoded += '//# sourceURL=' + codeUnit.address;
     try {

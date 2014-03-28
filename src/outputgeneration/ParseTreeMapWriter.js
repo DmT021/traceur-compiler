@@ -27,7 +27,6 @@ export class ParseTreeMapWriter extends ParseTreeWriter {
     this.sourceMapGenerator_ = sourceMapGenerator;
     this.outputLineCount_ = 1;
     this.isFirstMapping_ = true;
-    this.embedContent_ = false;
   }
 
   //
@@ -113,9 +112,8 @@ export class ParseTreeMapWriter extends ParseTreeWriter {
     };
     if (position.source.name !== this.sourceName_) {
       this.sourceName_ = position.source.name;
-      if (this.embedContent_)
-          this.sourceMapGenerator_.setSourceContent(position.source.name,
-              position.source.contents);
+      this.sourceMapGenerator_.setSourceContent(position.source.name,
+          position.source.contents);
     }
     this.flushMappings();
   }
